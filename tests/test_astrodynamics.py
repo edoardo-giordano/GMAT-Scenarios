@@ -14,7 +14,7 @@ def test_readTLE():
     # Test for the TLE_reader function
     # Test for n. of lines and length
 
-    file_TLE = r"./test/TLE_test.txt"
+    file_TLE = r"./tests/TLE_test.txt"
 
     lines = TLE_reader(file_TLE)
 
