@@ -2,3 +2,5 @@
 __pycache__
 .pytest_cache
 .vscode
+S01_mission_analysis/gmat_files/generated
+S01_mission_analysis/output

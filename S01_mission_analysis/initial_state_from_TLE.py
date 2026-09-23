@@ -1,7 +1,16 @@
 # Script to initialise the state of a SC from TLE
 
+import os
 from pathlib import Path
 from src.astrodynamics import TLE_reader, IC_epoch
+
+
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+output_dir = os.path.join(repo_root, "01_mission_analysis", "output")
+os.makedirs(output_dir, exist_ok=True)
+
+contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
+eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
 
 
 def generate_script_from_tle(tle_file, template_path, output_script_path, start_date):
@@ -13,7 +22,7 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
 
     To be used to set the script that has to be launched in GMAT 
     """
-    # Read TLE, find initial state and epoch
+    #### ----- Read TLE, find initial state and epoch
 
     line0, line1, line2 = TLE_reader(tle_file)
     r0, v0, t0 = IC_epoch(line0, line1, line2, start_date)
@@ -22,12 +31,24 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
 
     template = Path(template_path).read_text()
 
+
+    #### ----- Set the file name 
+
     filename = set_name(line0, mt0_GMAT_str)
 
     output_script_path = output_script_path + filename
 
+    #### ----- Set the output path
 
-    # Find and replace the placeholder in the gmat template 
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
+    os.makedirs(output_dir, exist_ok=True)
+
+    contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
+    eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
+
+
+    #### ----- Find and replace the placeholder in the gmat template 
 
     filled = (
         template
@@ -38,11 +59,13 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
         .replace("{{VX}}", repr(float(v0[0])))
         .replace("{{VY}}", repr(float(v0[1])))
         .replace("{{VZ}}", repr(float(v0[2])))
+        .replace("{{ECLIPSE_OUTPUT}}", repr(eclipse_output_path))
+        .replace("{{CONTACT_OUTPUT}}", repr(contact_output_path))
     )
 
     Path(output_script_path).write_text(filled)
 
-    # Print the output 
+    #### ----- Print the output 
 
     sd = start_date
 
@@ -74,6 +97,6 @@ if __name__ == "__main__":
     generate_script_from_tle(
         tle_file="./S01_mission_analysis/TLE_file.txt",
         template_path="./S01_mission_analysis/gmat_files/mission_template.script",
-        output_script_path="./S01_mission_analysis/gmat_files/",
+        output_script_path="./S01_mission_analysis/gmat_files/generated/",
         start_date=[2026, 9, 19, 12, 0, 0],
     )
