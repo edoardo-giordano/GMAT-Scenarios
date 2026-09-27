@@ -63,23 +63,7 @@ MySat.EulerAngleSequence = '321';
 %---------- GroundStations
 %----------------------------------------
 
-Create GroundStation Redu;
-Redu.OrbitColor = Thistle;
-Redu.TargetColor = DarkGray;
-Redu.CentralBody = Earth;
-Redu.StateType = Spherical;
-Redu.HorizonReference = Ellipsoid;
-Redu.Location1 = 50.0005;
-Redu.Location2 = 5.1453;
-Redu.Location3 = 0.387;
-Redu.Id = 'Redu';
-Redu.IonosphereModel = 'None';
-Redu.TroposphereModel = 'None';
-Redu.DataSource = 'Constant';
-Redu.Temperature = 295.1;
-Redu.Pressure = 1013.5;
-Redu.Humidity = 55;
-Redu.MinimumElevationAngle = 7;
+{{GROUND_STATIONS}}
 
 %----------------------------------------
 %---------- ForceModels
@@ -143,7 +127,7 @@ ContactLocator1.UseStellarAberration = true;
 ContactLocator1.WriteReport = true;
 ContactLocator1.RunMode = Automatic;
 ContactLocator1.UseEntireInterval = true;
-ContactLocator1.Observers = {Redu};
+ContactLocator1.Observers = {{OBSERVERS_LIST}};
 ContactLocator1.LightTimeDirection = Transmit;
 ContactLocator1.LeftJustified = false;
 ContactLocator1.ReportPrecision = 6;
@@ -205,7 +189,7 @@ GMAT DefaultGroundTrackPlot.UpperLeft = [ 0.02588235294117647 0.1682692307692308
 GMAT DefaultGroundTrackPlot.Size = [ 0.5600000000000001 0.8076923076923077 ];
 GMAT DefaultGroundTrackPlot.RelativeZOrder = 27;
 GMAT DefaultGroundTrackPlot.Maximized = false;
-GMAT DefaultGroundTrackPlot.Add = {Redu, MySat};
+GMAT DefaultGroundTrackPlot.Add = {{OBSERVERS_LIST_GT}};
 GMAT DefaultGroundTrackPlot.DataCollectFrequency = 1;
 GMAT DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
 GMAT DefaultGroundTrackPlot.NumPointsToRedraw = 0;
