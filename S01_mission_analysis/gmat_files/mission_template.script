@@ -129,7 +129,7 @@ EclipseLocator1.UseStellarAberration = true;
 EclipseLocator1.WriteReport = true;
 EclipseLocator1.RunMode = Automatic;
 EclipseLocator1.UseEntireInterval = true;
-EclipseLocator1.EclipseTypes = {'Umbra', 'Penumbra', 'Antumbra'};
+EclipseLocator1.EclipseTypes = {'Umbra'};
 
 Create ContactLocator ContactLocator1;
 ContactLocator1.Target = MySat;

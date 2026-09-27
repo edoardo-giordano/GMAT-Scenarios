@@ -6,7 +6,7 @@ from src.astrodynamics import TLE_reader, IC_epoch
 
 
 repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-output_dir = os.path.join(repo_root, "01_mission_analysis", "output")
+output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
 os.makedirs(output_dir, exist_ok=True)
 
 contact_output_path = os.path.join(output_dir, "ContactLocator.txt")

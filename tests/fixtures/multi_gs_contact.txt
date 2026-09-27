@@ -1,0 +1,15 @@
+Target: MySat
+
+Observer: Redu
+Start Time (UTC)            Stop Time (UTC)               Duration (s)         
+19 Sep 2026 06:00:00.000    19 Sep 2026 06:05:00.000      300.0
+19 Sep 2026 20:00:00.000    19 Sep 2026 20:05:00.000      300.0
+
+
+Observer: Fucino
+Start Time (UTC)            Stop Time (UTC)               Duration (s)         
+19 Sep 2026 08:00:00.000    19 Sep 2026 08:05:00.000      300.0
+19 Sep 2026 09:00:00.000    19 Sep 2026 09:05:00.000      300.0
+
+
+Number of events : 4
