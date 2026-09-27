@@ -3,9 +3,9 @@
 import os
 import numpy as np
 import pandas as pd
-from src.data_analysis import parse_locator_report, compute_gap_statistics
+from src.data_analysis import *
 
-def data_analyser(contact_filepath:str, eclipse_filepath:str):
+def data_analyser(output_dir:str, contact_filepath:str, eclipse_filepath:str):
 
     '''Contact and eclipse data analyser'''
 
@@ -13,11 +13,16 @@ def data_analyser(contact_filepath:str, eclipse_filepath:str):
     data_contact = parse_locator_report(contact_filepath)                                   # data is a DataFrame
     stats_contact = compute_gap_statistics(data_contact)
     data_printer(stats_contact)
+    gantt_contact_title = "Contact analysis"
+    plot_gantt(data_contact, gantt_contact_title, output_dir)
+    plot_contact_overview(data_contact, output_dir)
 
     # EclipseLocator.txt file
     data_eclipse = parse_locator_report(eclipse_filepath)
     stats_eclipse = compute_gap_statistics(data_eclipse)
     data_printer(stats_eclipse)
+    gantt_eclipse_title = "Eclipse analysis"
+    plot_gantt(data_eclipse, gantt_eclipse_title, output_dir)
 
 
 def data_printer(stats: pd.DataFrame):
@@ -50,4 +55,4 @@ if __name__ == "__main__":
     output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
     contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
     eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
-    data_analyser(contact_output_path, eclipse_output_path)
+    data_analyser(output_dir, contact_output_path, eclipse_output_path)

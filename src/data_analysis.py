@@ -1,5 +1,9 @@
+# Script for data analysis
+
 import re
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 
 def parse_locator_report(filepath: str) -> pd.DataFrame:
@@ -102,3 +106,114 @@ def compute_gap_statistics(df: pd.DataFrame) -> pd.DataFrame:
         })
 
     return pd.DataFrame(results)
+
+def plot_gantt(df: pd.DataFrame, plot_title: str, output_dir:str):
+
+    # Gantt plotter
+
+    fig, ax = plt.subplots(figsize=(12, 3))
+
+    for i, (obs, group) in enumerate(df.groupby("Observer", dropna=False)):
+        intervals = [
+            (mdates.date2num(row.AOS), mdates.date2num(row.LOS) - mdates.date2num(row.AOS))
+            for row in group.itertuples()
+        ]
+        ax.broken_barh(intervals, (i - 0.4, 0.8), facecolors="tab:blue")
+
+    labels = [str(obs) if obs is not None else "N/A" for obs, _ in df.groupby("Observer", dropna=False)]
+    ax.set_yticks(range(len(labels)))
+    ax.set_yticklabels(labels)
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b %H:%M"))
+    ax.set_xlabel("Time (UTC)")
+    ax.set_title(plot_title)
+    ax.grid(axis="x", linestyle="--", alpha=0.5)
+    ax.grid(axis="y", linestyle=":", alpha=0.3)
+    ax.set_axisbelow(True)
+    plt.tight_layout()
+    pic_name = (plot_title.replace(" ","_")).lower() + ".png"
+    pic_path = output_dir + "/" + pic_name
+    plt.savefig(pic_path)
+    plt.show()
+
+def plot_contact_overview(df, output_dir:str, title="Contact analysis"):
+    groups = list(df.groupby("Observer", dropna=False))
+    n_gs = len(groups)
+    colors = plt.cm.tab10.colors
+
+    if n_gs <4:
+        colors = [(0, 0.4470, 0.7410), (0.8500, 0.3250, 0.0980), (0.9290, 0.6940, 0.1250)]
+
+    fig, (ax1, ax2) = plt.subplots(
+        2, 1, figsize=(12, 2 + 1.2 * n_gs), sharex=True,
+        gridspec_kw={"height_ratios": [n_gs, 2]}
+    )
+
+    y_labels = []
+
+    bar_width_min = 15                                                                  # bar width in min
+    offset_step_min = bar_width_min * 1.2                                               # distance between bars (different GS)
+
+    for i, (observer, group) in enumerate(groups):
+        group = group.sort_values("AOS").reset_index(drop=True)
+        color = colors[i % len(colors)]
+        label_name = str(observer) if observer is not None else "N/A"
+        y_labels.append(label_name)
+
+        # Gantt
+        for _, row in group.iterrows():
+            ax1.barh(i, row["LOS"] - row["AOS"],
+                     left=row["AOS"],
+                     height=0.4,
+                     color=color,
+                     edgecolor="black", linewidth=0.5)
+            ax1.grid(axis="x", linestyle="--", alpha=0.5)
+            ax1.grid(axis="y", linestyle=":", alpha=0.3)
+            ax1.set_axisbelow(True)
+
+        gaps = (group["AOS"].shift(-1) - group["LOS"]).dropna()
+        if not gaps.empty:
+            idx_max_gap = gaps.dt.total_seconds().idxmax()
+            gap_start = group["LOS"].iloc[idx_max_gap]
+            gap_end = group["AOS"].iloc[idx_max_gap + 1]
+            gap_h = gaps.dt.total_seconds().max() / 3600
+
+            ax1.barh(i, gap_end - gap_start,
+                     left=gap_start,
+                     height=0.4,
+                     color="tomato",
+                     alpha=0.5,
+                     label=f"Gap max ({label_name}): {gap_h:.1f} h" if i == 0 else None)
+
+        # Contact duration
+        offset = pd.Timedelta(minutes=(i - (n_gs - 1) / 2) * offset_step_min)
+        x_dodged = group["AOS"] + offset
+
+        ax2.bar(x_dodged, group["Duration_s"],
+                width=bar_width_min / (24 * 60),   # bar width in days
+                color=color,
+                edgecolor="black", linewidth=0.5,
+                alpha=0.9,
+                label=label_name)
+
+    ax1.set_yticks(range(n_gs))
+    ax1.set_yticklabels(y_labels)
+    ax1.set_ylabel("Ground Station")
+    ax1.set_title(title)
+    ax1.grid(axis="x", linestyle="--", alpha=0.5)
+    ax1.set_ylim(-0.5, n_gs - 0.5)
+
+    ax2.set_ylabel("Duration [s]")
+    ax2.set_xlabel("Date (UTC)")
+    ax2.legend(loc="upper right", ncol=min(n_gs, 4), fontsize=8)
+    ax2.grid(axis="x", linestyle="--", alpha=0.5)
+
+    ax2.xaxis.set_major_formatter(mdates.DateFormatter("%d %b\n%H:%M"))
+    ax2.xaxis.set_major_locator(mdates.AutoDateLocator())
+
+    pic_name = "contact_overview" + ".png"
+    pic_path = output_dir + "/" + pic_name
+    plt.savefig(pic_path)
+
+    plt.tight_layout()
+    plt.show()
