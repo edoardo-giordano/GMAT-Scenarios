@@ -46,3 +46,12 @@ def IC_epoch(name:str, line1:str, line2:str, date:list):
     v = geocentric.velocity.km_per_s                        # [km/s] velocity
 
     return r, v, jd
+
+def jd_from_date(date):
+
+    ts = load.timescale(builtin=True)
+    year, month, day, hour, minute, sec = date
+    t = ts.utc(year, month, day, hour, minute, sec)         # epoch time (UTC Julian Date)
+    jd = t.ut1                                              # extraction of float (UTC Julian Date)
+
+    return jd
