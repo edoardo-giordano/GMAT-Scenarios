@@ -63,23 +63,7 @@ MySat.EulerAngleSequence = '321';
 %---------- GroundStations
 %----------------------------------------
 
-Create GroundStation Redu;
-Redu.OrbitColor = Thistle;
-Redu.TargetColor = DarkGray;
-Redu.CentralBody = Earth;
-Redu.StateType = Spherical;
-Redu.HorizonReference = Ellipsoid;
-Redu.Location1 = 50.0005;
-Redu.Location2 = 5.1453;
-Redu.Location3 = 0.387;
-Redu.Id = 'Redu';
-Redu.IonosphereModel = 'None';
-Redu.TroposphereModel = 'None';
-Redu.DataSource = 'Constant';
-Redu.Temperature = 295.1;
-Redu.Pressure = 1013.5;
-Redu.Humidity = 55;
-Redu.MinimumElevationAngle = 7;
+{{GROUND_STATIONS}}
 
 %----------------------------------------
 %---------- ForceModels
@@ -118,7 +102,7 @@ DefaultProp.StopIfAccuracyIsViolated = true;
 
 Create EclipseLocator EclipseLocator1;
 EclipseLocator1.Spacecraft = MySat;
-EclipseLocator1.Filename = '.\src\gmat_files\EclipseLocator.txt';
+EclipseLocator1.Filename = {{ECLIPSE_OUTPUT}};
 EclipseLocator1.OccultingBodies = {Earth, Luna};
 EclipseLocator1.InputEpochFormat = 'TAIModJulian';
 EclipseLocator1.InitialEpoch = '21545';
@@ -127,13 +111,13 @@ EclipseLocator1.FinalEpoch = '21545.138';
 EclipseLocator1.UseLightTimeDelay = true;
 EclipseLocator1.UseStellarAberration = true;
 EclipseLocator1.WriteReport = true;
-EclipseLocator1.RunMode = Manual;
+EclipseLocator1.RunMode = Automatic;
 EclipseLocator1.UseEntireInterval = true;
-EclipseLocator1.EclipseTypes = {'Umbra', 'Penumbra', 'Antumbra'};
+EclipseLocator1.EclipseTypes = {'Umbra'};
 
 Create ContactLocator ContactLocator1;
 ContactLocator1.Target = MySat;
-ContactLocator1.Filename = '.\src\gmat_files\ContactLocator.txt';
+ContactLocator1.Filename = {{CONTACT_OUTPUT}};
 ContactLocator1.InputEpochFormat = 'TAIModJulian';
 ContactLocator1.InitialEpoch = '21545';
 ContactLocator1.StepSize = 600;
@@ -141,9 +125,9 @@ ContactLocator1.FinalEpoch = '21545.138';
 ContactLocator1.UseLightTimeDelay = true;
 ContactLocator1.UseStellarAberration = true;
 ContactLocator1.WriteReport = true;
-ContactLocator1.RunMode = Manual;
+ContactLocator1.RunMode = Automatic;
 ContactLocator1.UseEntireInterval = true;
-ContactLocator1.Observers = {Redu};
+ContactLocator1.Observers = {{OBSERVERS_LIST}};
 ContactLocator1.LightTimeDirection = Transmit;
 ContactLocator1.LeftJustified = false;
 ContactLocator1.ReportPrecision = 6;
@@ -205,7 +189,7 @@ GMAT DefaultGroundTrackPlot.UpperLeft = [ 0.02588235294117647 0.1682692307692308
 GMAT DefaultGroundTrackPlot.Size = [ 0.5600000000000001 0.8076923076923077 ];
 GMAT DefaultGroundTrackPlot.RelativeZOrder = 27;
 GMAT DefaultGroundTrackPlot.Maximized = false;
-GMAT DefaultGroundTrackPlot.Add = {Redu, MySat};
+GMAT DefaultGroundTrackPlot.Add = {{OBSERVERS_LIST_GT}};
 GMAT DefaultGroundTrackPlot.DataCollectFrequency = 1;
 GMAT DefaultGroundTrackPlot.UpdatePlotFrequency = 50;
 GMAT DefaultGroundTrackPlot.NumPointsToRedraw = 0;
@@ -220,4 +204,4 @@ GMAT DefaultGroundTrackPlot.TextureMap = '../data/graphics/texture/ModifiedBlueM
 %----------------------------------------
 
 BeginMissionSequence
-Propagate 'Prop x sec' DefaultProp(MySat) {MySat.ElapsedSecs = 604800, OrbitColor = [255 0 0]};
+Propagate 'Prop x sec' DefaultProp(MySat) {MySat.ElapsedSecs = 172800, OrbitColor = [255 0 0]};

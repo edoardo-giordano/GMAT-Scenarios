@@ -1,0 +1,9 @@
+Target: MySat
+
+Observer: Redu
+There are no contact events in the time interval 01 Jan 2000 11:58:55.816 to 01 Jan 2000 11:58:55.816
+
+
+Number of events : 0
+
+

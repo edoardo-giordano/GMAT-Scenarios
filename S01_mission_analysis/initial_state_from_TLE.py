@@ -1,7 +1,22 @@
 # Script to initialise the state of a SC from TLE
 
+import os
 from pathlib import Path
 from src.astrodynamics import TLE_reader, IC_epoch
+
+
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
+os.makedirs(output_dir, exist_ok=True)
+
+contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
+eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
+
+ground_stations = {
+    "Redu":     {"lat": 50.0022, "lon": 5.1478,  "alt": 0.145, "min_elevation": 5},
+    "Svalbard": {"lat": 78.9296, "lon": 11.8653, "alt": 0.075, "min_elevation": 5},
+    "Fucino":   {"lat": 41.9766, "lon": 13.6029, "alt": 0.680, "min_elevation": 5},
+}
 
 
 def generate_script_from_tle(tle_file, template_path, output_script_path, start_date):
@@ -13,7 +28,7 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
 
     To be used to set the script that has to be launched in GMAT 
     """
-    # Read TLE, find initial state and epoch
+    #### ----- Read TLE, find initial state and epoch
 
     line0, line1, line2 = TLE_reader(tle_file)
     r0, v0, t0 = IC_epoch(line0, line1, line2, start_date)
@@ -22,12 +37,27 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
 
     template = Path(template_path).read_text()
 
+
+    #### ----- Set the file name 
+
     filename = set_name(line0, mt0_GMAT_str)
 
     output_script_path = output_script_path + filename
 
+    #### ----- Set the output path
 
-    # Find and replace the placeholder in the gmat template 
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
+    os.makedirs(output_dir, exist_ok=True)
+
+    contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
+    eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
+
+
+    #### ----- Find and replace the placeholder in the gmat template 
+
+    gs_block, observers_list = build_all_ground_stations(ground_stations)
+    observers_list_GT = observers_list.rstrip("}") + ", MySat}"
 
     filled = (
         template
@@ -38,11 +68,16 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
         .replace("{{VX}}", repr(float(v0[0])))
         .replace("{{VY}}", repr(float(v0[1])))
         .replace("{{VZ}}", repr(float(v0[2])))
+        .replace("{{ECLIPSE_OUTPUT}}", repr(eclipse_output_path))
+        .replace("{{CONTACT_OUTPUT}}", repr(contact_output_path))
+        .replace("{{GROUND_STATIONS}}", gs_block)
+        .replace("{{OBSERVERS_LIST}}", observers_list)
+        .replace("{{OBSERVERS_LIST_GT}}", observers_list_GT)
     )
 
     Path(output_script_path).write_text(filled)
 
-    # Print the output 
+    #### ----- Print the output 
 
     sd = start_date
 
@@ -52,7 +87,11 @@ def generate_script_from_tle(tle_file, template_path, output_script_path, start_
     print(f"\nInitial state (J2000 RF):")
     print(f"  X = {r0[0]: .12f}      [km]\n  Y = {r0[1]: .12f}      [km]\n  Z = {r0[2]: .12f}      [km]\n")
     print(f"  VX = {v0[0]: .12f}      [km/s]\n  VY = {v0[1]: .12f}      [km/s]\n  VZ = {v0[2]: .12f}      [km/s]")
+    print(f"\nSelected Ground Stations:")
+    for name_GS, p in ground_stations.items():
+        print(name_GS)
     print(f"\nGenerated script: {output_script_path}")
+    print()
 
 def set_name(line0:str, epoch:str):
     '''Set the name of the .script file based on TLE's line 0
@@ -69,11 +108,34 @@ def set_name(line0:str, epoch:str):
 
     return filename + ".script"
 
+def build_ground_station_block(name: str, params: dict) -> str:
+
+    # Generates the "Create GroundStation" for a single GS
+    return (
+        f"Create GroundStation {name};\n"
+        f"{name}.CentralBody = Earth;\n"
+        f"{name}.StateType = Spherical;\n"
+        f"{name}.HorizonReference = Ellipsoid;\n"
+        f"{name}.Location1 = {params['lat']};\n"
+        f"{name}.Location2 = {params['lon']};\n"
+        f"{name}.Location3 = {params['alt']};\n"
+        f"{name}.MinimumElevationAngle = {params['min_elevation']};\n"
+    )
+
+def build_all_ground_stations(ground_stations: dict) -> tuple[str, str]:
+
+    # Generates the sequence of GS and the list that is required for the ContactLocator
+    
+    blocks = [build_ground_station_block(name, p) for name, p in ground_stations.items()]
+    definitions = "\n".join(blocks)
+    observers_list = "{" + ", ".join(ground_stations.keys()) + "}"
+    return definitions, observers_list
+
 
 if __name__ == "__main__":
     generate_script_from_tle(
         tle_file="./S01_mission_analysis/TLE_file.txt",
         template_path="./S01_mission_analysis/gmat_files/mission_template.script",
-        output_script_path="./S01_mission_analysis/gmat_files/",
-        start_date=[2026, 9, 19, 12, 0, 0],
+        output_script_path="./S01_mission_analysis/gmat_files/generated/",
+        start_date=[2026, 28, 19, 12, 0, 0],
     )
