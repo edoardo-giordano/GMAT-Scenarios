@@ -8,7 +8,7 @@ Each scenario is self-contained: a GMAT script, the analysis code and a README w
 
 | # | Scenario | Topic | Status |
 |---|---|---|---|
-| 01 | [Mission analysis](S01_mission_analysis) | TLE propagation, ground station contacts and eclipses (ISS over 3 stations) | Done |
+| 01 | [Mission analysis](S01_mission_analysis) | TLE propagation, ground station contacts and eclipses | Done |
 | 02 | LEOP | First contact after injection, orbit determination | Planned |
 | 03 | Orbit raising | GTO to GEO | Planned |
 | 04 | Station keeping | GEO/LEO maintenance | Planned |
