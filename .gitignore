@@ -4,3 +4,5 @@ __pycache__
 .vscode
 S01_mission_analysis/gmat_files/generated
 S01_mission_analysis/output
+S02_LEOP/gmat_files/generated
+S02_LEOP/output

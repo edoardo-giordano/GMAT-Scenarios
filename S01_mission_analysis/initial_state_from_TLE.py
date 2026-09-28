@@ -3,14 +3,8 @@
 import os
 from pathlib import Path
 from src.astrodynamics import TLE_reader, IC_epoch
+from src.script_tools import *
 
-
-repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-output_dir = os.path.join(repo_root, "S01_mission_analysis", "output")
-os.makedirs(output_dir, exist_ok=True)
-
-contact_output_path = os.path.join(output_dir, "ContactLocator.txt")
-eclipse_output_path = os.path.join(output_dir, "EclipseLocator.txt")
 
 ground_stations = {
     "Redu":     {"lat": 50.0022, "lon": 5.1478,  "alt": 0.145, "min_elevation": 5},
@@ -108,28 +102,6 @@ def set_name(line0:str, epoch:str):
 
     return filename + ".script"
 
-def build_ground_station_block(name: str, params: dict) -> str:
-
-    # Generates the "Create GroundStation" for a single GS
-    return (
-        f"Create GroundStation {name};\n"
-        f"{name}.CentralBody = Earth;\n"
-        f"{name}.StateType = Spherical;\n"
-        f"{name}.HorizonReference = Ellipsoid;\n"
-        f"{name}.Location1 = {params['lat']};\n"
-        f"{name}.Location2 = {params['lon']};\n"
-        f"{name}.Location3 = {params['alt']};\n"
-        f"{name}.MinimumElevationAngle = {params['min_elevation']};\n"
-    )
-
-def build_all_ground_stations(ground_stations: dict) -> tuple[str, str]:
-
-    # Generates the sequence of GS and the list that is required for the ContactLocator
-    
-    blocks = [build_ground_station_block(name, p) for name, p in ground_stations.items()]
-    definitions = "\n".join(blocks)
-    observers_list = "{" + ", ".join(ground_stations.keys()) + "}"
-    return definitions, observers_list
 
 
 if __name__ == "__main__":
