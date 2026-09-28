@@ -137,5 +137,5 @@ if __name__ == "__main__":
         tle_file="./S01_mission_analysis/TLE_file.txt",
         template_path="./S01_mission_analysis/gmat_files/mission_template.script",
         output_script_path="./S01_mission_analysis/gmat_files/generated/",
-        start_date=[2026, 9, 19, 12, 0, 0],
+        start_date=[2026, 28, 19, 12, 0, 0],
     )
