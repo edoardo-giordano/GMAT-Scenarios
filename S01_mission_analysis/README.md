@@ -116,17 +116,6 @@ For many satellites it is very important to know when it is in eclipse or not. T
 
 ![Eclipse overview](output/eclipse_analysis.png)
 
-## Discussion
-
-`TODO: 3-5 lines. Suggestions:`
-
-- Which station gives the best coverage and why (latitude vs. inclination 51.6°)
-- Why Svalbard sees more/fewer passes than the mid-latitude stations
-- Longest gap and what it implies operationally
-- Eclipse fraction per orbit and what it means for power/thermal
-
-
-
 
 ## Assumptions and limitations
 
