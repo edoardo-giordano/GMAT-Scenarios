@@ -3,3 +3,4 @@ pytest
 matplotlib
 skyfield
 pandas
+tabulate

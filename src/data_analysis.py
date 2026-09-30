@@ -59,8 +59,8 @@ def parse_locator_report(filepath: str) -> pd.DataFrame:
     df = pd.DataFrame(rows, columns=["Observer", "AOS", "LOS", "Duration_s"])
 
     if not df.empty:
-        df["AOS"] = pd.to_datetime(df["AOS"], format=fmt)
-        df["LOS"] = pd.to_datetime(df["LOS"], format=fmt)
+        df["AOS"] = pd.to_datetime(df["AOS"], format=fmt).dt.tz_localize("UTC")
+        df["LOS"] = pd.to_datetime(df["LOS"], format=fmt).dt.tz_localize("UTC")
         df["Duration_s"] = df["Duration_s"].astype(float)
 
     return df.reset_index(drop=True)
@@ -215,5 +215,61 @@ def plot_contact_overview(df, output_dir:str, title="Contact analysis"):
     pic_path = output_dir + "/" + pic_name
     plt.savefig(pic_path)
 
+    plt.tight_layout()
+    plt.show()
+
+def plot_contact_eclipse_24h(df_contacts: pd.DataFrame, df_eclipse: pd.DataFrame, start_date: pd.Timestamp, output_dir: str):
+    
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    #### Plot eclipses on the background
+    first_eclipse = True                                    # to avoid multiple labels
+    for _, eclipse in df_eclipse.iterrows():
+        ax.axvspan(
+            eclipse["AOS"],
+            eclipse["LOS"],
+            color="gray",
+            alpha=0.35,
+            label="Eclipse" if first_eclipse else "",
+            zorder=1,
+        )
+        first_eclipse = False
+
+    #### Gantt plot - as horizontal bars
+    observers = df_contacts["Observer"].unique()
+    y_positions = {obs: i for i, obs in enumerate(observers)}
+
+    for _, contact in df_contacts.iterrows():
+        obs = contact["Observer"]
+        start = contact["AOS"]
+        duration = contact["LOS"] - start
+
+        ax.barh(
+            y=y_positions[obs],
+            width=duration,
+            left=start,
+            height=0.4,
+            color="#1f77b4",
+            edgecolor="black",
+            align="center",
+            zorder=2,
+        )
+
+    ax.set_yticks(list(y_positions.values()))
+    ax.set_yticklabels(list(y_positions.keys()))
+    ax.set_ylabel("Observer (GS)")
+    ax.set_xlabel("Time (UTC)")
+    ax.set_title("Contact and eclipse windows")
+    ax.set_xlim(left=start_date)
+
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%H:%M", tz="UTC"))
+    ax.xaxis.set_major_locator(mdates.HourLocator(interval=2))                  # tick every 2 hours
+    fig.autofmt_xdate()                                                         # tilted x-axis label
+
+    ax.grid(True, axis="x", linestyle="--", alpha=0.5)
+    ax.legend(loc="upper right")
+
+    file_name = output_dir + '/' + 'first_contact_overview.png'
+    plt.savefig(file_name)
     plt.tight_layout()
     plt.show()

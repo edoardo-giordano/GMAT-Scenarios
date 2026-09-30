@@ -124,12 +124,12 @@ def test_gap_statistics_multi_observer_gap_dates_not_mixed():
     redu_gap_start = result.loc["Redu", "gap_max_date"]
     redu_gap_end = result.loc["Redu", "gap_min_date"]
     
-    assert redu_gap_start == pd.Timestamp("2026-09-19 06:05:00")
-    assert redu_gap_end == pd.Timestamp("2026-09-19 20:00:00")
+    assert redu_gap_start == pd.Timestamp("2026-09-19 06:05:00", tz="UTC")
+    assert redu_gap_end == pd.Timestamp("2026-09-19 20:00:00", tz="UTC")
 
     # Fucino's gap shall start and end with Fucino's data
     fucino_gap_start = result.loc["Fucino", "gap_max_date"]
     fucino_gap_end = result.loc["Fucino", "gap_min_date"]
 
-    assert fucino_gap_start == pd.Timestamp("2026-09-19 08:05:00")
-    assert fucino_gap_end == pd.Timestamp("2026-09-19 09:00:00")
+    assert fucino_gap_start == pd.Timestamp("2026-09-19 08:05:00", tz="UTC")
+    assert fucino_gap_end == pd.Timestamp("2026-09-19 09:00:00", tz="UTC")
