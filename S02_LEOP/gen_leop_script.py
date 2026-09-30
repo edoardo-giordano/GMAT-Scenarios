@@ -4,32 +4,33 @@ import os
 from pathlib import Path
 from src.script_tools import *
 from src.astrodynamics import jd_from_date
+from S02_LEOP.leop_config import epoch, stations, nominal_state_GTO
 
 # GS dictionary
 # note: lat in [-90, 90] deg
 #       lon in [0, 360] deg
-ground_stations = {
-    # "Burum":     {"lat": 53.271, "lon": 6.212,  "alt": 0.001, "min_elevation": 5},
-    "Betzdirf": {"lat": 49.688, "lon": 6.350, "alt": 0.320, "min_elevation": 5},
-    "Fucino":   {"lat": 41.9766, "lon": 13.6029, "alt": 0.650, "min_elevation": 5},
-    "Perth": {"lat": -31.802, "lon": 115.885, "alt": 0.022, "min_elevation": 5},
-    "Paumalu": {"lat": 21.670, "lon": 201.967, "alt": 0.16, "min_elevation": 5}
-}
+# ground_stations = {
+#     # "Burum":     {"lat": 53.271, "lon": 6.212,  "alt": 0.001, "min_elevation": 5},
+#     "Betzdirf": {"lat": 49.688, "lon": 6.350, "alt": 0.320, "min_elevation": 5},
+#     "Fucino":   {"lat": 41.9766, "lon": 13.6029, "alt": 0.650, "min_elevation": 5},
+#     "Perth": {"lat": -31.802, "lon": 115.885, "alt": 0.022, "min_elevation": 5},
+#     "Paumalu": {"lat": 21.670, "lon": 201.967, "alt": 0.16, "min_elevation": 5}
+# }
 
 # Nominal state for a GTO (Ariane 6)
 # RAAN is chosen
 # TA is assumed low, injection near periapsis
 
-nominal_state_GTO = {
-    "SMA" : 24396,                                                                          # [km]  semi-major axis
-    "ECC" : 0.7283,                                                                         # [ ]   eccentricity
-    "INC" : 6,                                                                              # [deg] inclination
-    "RAAN": 20,                                                                             # [deg] RAAN
-    "AOP" : 178,                                                                            # [deg] argument of periapsis
-    "TA"  : 5                                                                               # [deg] true anomaly
-}
+# nominal_state_GTO = {
+#     "SMA" : 24396,                                                                          # [km]  semi-major axis
+#     "ECC" : 0.7283,                                                                         # [ ]   eccentricity
+#     "INC" : 6,                                                                              # [deg] inclination
+#     "RAAN": 20,                                                                             # [deg] RAAN
+#     "AOP" : 178,                                                                            # [deg] argument of periapsis
+#     "TA"  : 5                                                                               # [deg] true anomaly
+# }
 
-def gen_script(state0, start_date, template_path, output_script_path):
+def gen_script(state0, start_date, ground_stations, template_path, output_script_path):
     '''This function generates a GMAT script ready to be run in the GUI'''
 
 
@@ -81,7 +82,8 @@ def gen_script(state0, start_date, template_path, output_script_path):
 if __name__ == "__main__":
     gen_script(
         state0 = nominal_state_GTO,
-        start_date=[2026,9,19,12,0,0],
+        start_date=epoch,
+        ground_stations=stations,
         template_path=r"./S02_LEOP/gmat_files/leop_template.script",
         output_script_path="./S02_LEOP/gmat_files/generated/"
     )
